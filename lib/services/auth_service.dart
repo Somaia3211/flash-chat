@@ -4,7 +4,7 @@ class AuthServices{
   User? get getCurrentUser=>_firebaseAuth.currentUser;
   final FirebaseAuth _firebaseAuth= FirebaseAuth.instance;
 
-  Stream<User?> get authStateChanges=>-_firebaseAuth.authStateChanges;
+  Stream<User?> get authStateChanges=> _firebaseAuth.authStateChanges();
 Future createUserWithEmailAndPassword(
     {required String email,required String password})async{
    return await _firebaseAuth
