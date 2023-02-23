@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flash_chat_starting_project/constants.dart';
 
 class ChatScreen extends StatefulWidget {
-  static const String id='chat_screen';
+  static const String id = 'chat_screen';
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final _fireStore=FirebaseFirestore.instance;
-  TextEditingController _messageTextController= TextEditingController();
+  final _fireStore = FirebaseFirestore.instance;
+  TextEditingController _messageTextController = TextEditingController();
 
   /*void getMessages() async{
      var messages= await _fireStore.collection('messages').get();
@@ -20,13 +20,13 @@ class _ChatScreenState extends State<ChatScreen> {
       print(messages.data());
     }
   }*/
-   void messagesStream(){
-     _fireStore.collection('messages').snapshots().listen((event) {
-       for( var messages in  event.docs){
-         print(messages.data());
-       }
-     });
-   }
+  void messagesStream() {
+    _fireStore.collection('messages').snapshots().listen((event) {
+      for (var messages in event.docs) {
+        print(messages.data());
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +39,9 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
-               /*Navigator.pop(context);
-               AuthServices().signOut();*/
-                messagesStream();
+                Navigator.pop(context);
+               AuthServices().signOut();
+
               }),
         ],
         title: const Text('⚡ ️Chat'),
@@ -51,6 +51,34 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            StreamBuilder<QuerySnapshot>(
+                stream: _fireStore.collection('messages').snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Expanded(
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          backgroundColor: Colors.lightBlue,
+                        ),
+                      ),
+                    );
+                  }
+                  if (snapshot.hasData) {
+                    var messages = snapshot.data!.docs;
+                    List<Text> messageWidgets = [];
+                    for (var message in messages) {
+                      var messageText = message.get('text');
+                      var sender = message.get('sender');
+                      Text messageWidget = Text('$messageText from $sender');
+                      messageWidgets.add(messageWidget);
+                    }
+                    return Column(children: messageWidgets);
+                  } else {
+                    return Center(
+                      child: Text('snapshot has not data'),
+                    );
+                  }
+                }),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
@@ -59,7 +87,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   Expanded(
                     child: TextField(
                       controller: _messageTextController,
-                      
                       decoration: kMessageTextFieldDecoration,
                     ),
                   ),
@@ -67,10 +94,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     onPressed: () {
                       //Implement send functionality
                       _fireStore.collection('messages').add({
-                        'date':DateTime.now().microsecondsSinceEpoch,
-                        'text':_messageTextController.text,
-                        'sender':AuthServices().getCurrentUser! .email,
-
+                        'date': DateTime.now().microsecondsSinceEpoch,
+                        'text': _messageTextController.text,
+                        'sender': AuthServices().getCurrentUser!.email,
                       });
                     },
                     child: const Icon(Icons.send,

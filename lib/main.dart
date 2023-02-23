@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash_chat_starting_project/screens/chat_screen.dart';
 import 'package:flash_chat_starting_project/screens/login_screen.dart';
 import 'package:flash_chat_starting_project/screens/registration_screen.dart';
+import 'package:flash_chat_starting_project/services/auth_service.dart';
 
 import 'constants.dart';
 import 'package:flutter/material.dart';
@@ -21,20 +23,25 @@ class FlashChat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return StreamBuilder<User?>(
+      stream: AuthServices().authStateChanges,
+      builder: (context, snapshot) {
+        return MaterialApp(
 
-      routes: {
-        WelcomeScreen.id:(context)=>WelcomeScreen(),
-        LoginScreen.id:(context)=>LoginScreen(),
-        RegistrationScreen.id:(context)=>RegistrationScreen(),
-         ChatScreen.id:(context)=>ChatScreen(),
-      },
-      initialRoute:  WelcomeScreen.id,
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: kBackgroundColor,
-      ),
+          routes: {
+            WelcomeScreen.id:(context)=>WelcomeScreen(),
+            LoginScreen.id:(context)=>LoginScreen(),
+            RegistrationScreen.id:(context)=>RegistrationScreen(),
+             ChatScreen.id:(context)=>ChatScreen(),
+          },
+          initialRoute:  AuthServices().authStateChanges!=null?ChatScreen.id:WelcomeScreen.id,
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData.dark().copyWith(
+            scaffoldBackgroundColor: kBackgroundColor,
+          ),
 
+        );
+      }
     );
   }
 }
