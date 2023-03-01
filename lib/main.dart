@@ -34,7 +34,7 @@ class FlashChat extends StatelessWidget {
             RegistrationScreen.id:(context)=>RegistrationScreen(),
              ChatScreen.id:(context)=>ChatScreen(),
           },
-          initialRoute:  AuthServices().authStateChanges!=null?ChatScreen.id:WelcomeScreen.id,
+          initialRoute:  AuthServices().authStateChanges !=null? ChatScreen.id: WelcomeScreen.id,
           debugShowCheckedModeBanner: false,
           theme: ThemeData.dark().copyWith(
             scaffoldBackgroundColor: kBackgroundColor,
